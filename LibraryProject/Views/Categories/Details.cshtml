@@ -1,0 +1,128 @@
+﻿@using PagedList.Mvc
+@using LibraryProject.Models
+@model PagedList.IPagedList<LibraryProject.Models.Book>
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    ViewBag.Title = @ViewBag.Category.Name;
+}
+<div id="update-message" style="text-align:center"></div>
+
+<h2>Ksiażki z kategorii @ViewBag.Category.Name</h2>
+@using (Html.BeginForm("Index", "Books", FormMethod.Get))
+{
+    <p>
+        Szukaj: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+        <button class="btn btn-info" type="submit"><i class="fa fa-search"></i> Szukaj</button>
+        <a href="/books" class="btn btn-success">
+            <span class="fa fa-refresh"></span> Pokaż wszystko
+        </a>
+    </p>
+}
+
+
+<div class="row">
+    @Html.Partial("_CategoriesPartial")
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-6 offset-6">
+                <p>
+                    Sortuj wedlug:
+                    @Html.ActionLink("Tytuł", "Details", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+                    @Html.ActionLink("Autor", "Details", new { sortOrder = ViewBag.AuthorSortParm, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+                    @Html.ActionLink("Data Wydania", "Details", new { sortOrder = ViewBag.DateSortParm, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            @foreach (var item in Model)
+            {
+
+                <div class="col-md-3">
+                    <div class="card" style="height: 25rem">
+                        @if (item.Image != null)
+                        {
+                            <a href="@Url.Action("Details", "Books", new {@id = item.ID})"><img src="~/Images/@item.Image" class="card-img-top" alt=""></a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Details", "Books", new {@id = item.ID})"><img src="~/Images/nophoto.jpg" class="card-img-top" alt=""></a>
+                        }
+                        <div class="row" onclick="tableFunction('@Url.Action("Details", "Books", new {@id = item.ID})')">
+                            <div class="col-md-12">
+                                <h6>@item.Title</h6>
+                            </div>
+                            <div class="col-md-12">
+                                <p>@item.Author.FullName</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" style="text-align: center">
+                                @if (Request.IsAuthenticated)
+                                {
+                                    <button class="btn btn-success AddLink" data-id="@item.ID">Dodaj do koszyka<i class="fa fa-cart-plus"></i></button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+        <div class="row">
+            <div class="col-md3 offset-9">
+                Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+
+                @Html.PagedListPager(Model, page => Url.Action("Details",
+                    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            // Document.ready -> link up remove event handler
+            $(".AddLink").click(function () {
+                // Get the id from the link
+                var recordToAdd = $(this).attr("data-id");
+                if (recordToAdd != '') {
+                    // Perform the ajax post
+                    $.post("/ShoppingCart/AddToCart", { "id": recordToAdd },
+                        function (data) {
+                            // Successful requests get here
+                            // Update the page elements
+                            if (data.MessageSuccess != '') {
+                                var messageSuccess = '<div class="alert alert-success" role="alert">' +
+                                    data.MessageSuccess +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageSuccess;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                            if (data.MessageWarning != '') {
+                                messageWarning = '<div class="alert alert-warning" role="alert">' +
+                                    data.MessageWarning +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageWarning;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                            if (data.MessageDanger != '') {
+                                messageDanger = '<div class="alert alert-warning" role="alert">' +
+                                    data.MessageDanger +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageDanger;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}

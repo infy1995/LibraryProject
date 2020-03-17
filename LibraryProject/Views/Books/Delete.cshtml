@@ -1,0 +1,17 @@
+﻿@model LibraryProject.Models.Book
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h4 style="text-align: center">Czy chcesz usunąć książkę @Model.Title ?</h4>
+
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+<div class="" style="text-align: center">
+    <a class="btn btn-info" href="javascript:history.go(-1)">Powrót</a>
+    <input type="submit" value="Usuń książkę" class="btn btn-danger" />
+</div>
+    }

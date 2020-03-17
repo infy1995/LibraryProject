@@ -1,0 +1,133 @@
+﻿@using LibraryProject.Models
+@model LibraryProject.Models.Order
+
+@{
+    ViewBag.Title = "Zamówienie numer " + @Model.ID + "";
+}
+<h3 style="text-align: center">Zamówienie numer @Model.ID</h3>
+<br />
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col">
+                ID zamówienia:
+            </div>
+            <div class="col">
+                <a style="color: black; text-decoration: none;" href="@Url.Action("Details", "Order", new {@Model.ID})">@Model.ID</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                Data zamówienia:
+            </div>
+            <div class="col">
+                @Model.OrderDate.ToString("HH:mm dd.MM.yy")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                Status zamówienia:
+            </div>
+            <div class="col">
+                @Html.Partial("_OrderStatus")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                Czytelnik:
+            </div>
+            <div class="col">
+                @Model.Profile.Login
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-warning container-fluid" href="@Url.Action("Index", "Support")">Powrót do listy zamówień</a>
+            </div>
+        </div>
+        @switch (@Model.OrderStatus)
+        {
+            case Order.OrderStatusEnum.Placed:
+                <div class="row">
+                    <div class="col-md-12">
+                        <a class="btn btn-success container-fluid" href="@Url.Action("Ready", "Support", new {@Model.ID})">Przygotuj książki</a>
+                    </div>
+                </div>
+                break;
+            case Order.OrderStatusEnum.Ready:
+                <div class="row">
+                    <div class="col-md-12">
+                        <a class="btn btn-danger container-fluid" href="@Url.Action("Rent", "Support", new {@Model.ID})">Wypożycz</a>
+                    </div>
+                </div>
+                break;
+
+
+        }
+
+    </div>
+    <div class="col-md-8">
+        <h4 style="text-align: center">Szczegóły zamówienia</h4>
+        <div class="row">
+            @foreach (var item in Model.OrderDetails)
+            {
+                <div class="col-md-11" style="margin-top: 10px; margin-bottom: 10px">
+                    <div class="row rounded" style="border: 2px solid wheat; background-color: white;">
+                        <div class="col-md-2">
+                            @if (item.Book.Image != null)
+                            {
+                                <img src="~/Images/@item.Book.Image" class="" width="70" height="100" alt="">
+                            }
+                            else
+                            {
+                                <img src="~/Images/nophoto.jpg" class="" width="70" height="100" alt="">
+                            }
+                        </div>
+                        <div class="col-4">
+                            <div class="row"><h4>@item.Book.Title</h4></div>
+                            <div class="row"><h6>@item.Book.Author.FullName</h6></div>
+                        </div>
+                        <div class="col-2">
+                            <div class="row"><h4>Status</h4></div>
+                            <div class="row">
+                                @switch (@item.DetailStatus)
+                                {
+                                    case OrderDetail.DetailStatusEnum.Placed:
+                                        <text>
+                                            W przygotowaniu
+                                        </text>
+                                        break;
+                                    case OrderDetail.DetailStatusEnum.Ready:
+                                        <text>
+                                            Gotowa do odbioru
+                                        </text>
+                                        break;
+                                    case OrderDetail.DetailStatusEnum.Rented:
+                                        <text>
+                                            Wypożyczona
+                                        </text>
+                                        break;
+                                    case OrderDetail.DetailStatusEnum.Returned:
+                                        <text>
+                                            Zwrócona
+                                        </text>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                @if (@item.DetailStatus == OrderDetail.DetailStatusEnum.Rented)
+                                {
+                                    <div class="col-md-10 offset-1">
+                                        <a class="btn btn-danger container-fluid" href="@Url.Action("Return", "Support", new {@item.ID})">Oddana</a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

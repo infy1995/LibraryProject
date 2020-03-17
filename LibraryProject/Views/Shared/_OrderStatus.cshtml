@@ -1,0 +1,24 @@
+﻿@using LibraryProject.Models
+@switch (@Model.OrderStatus)
+{
+    case Order.OrderStatusEnum.Placed:
+        <text>
+            W przygotowaniu
+        </text>
+        break;
+    case Order.OrderStatusEnum.Ready:
+        <text>
+            Przygotowane
+        </text>
+        break;
+    case Order.OrderStatusEnum.Rented:
+        <text>
+            Wypożyczone
+        </text>
+        break;
+    case Order.OrderStatusEnum.Returned:
+        <text>
+            Zakończone
+        </text>
+        break;
+}

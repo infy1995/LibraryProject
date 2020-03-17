@@ -1,0 +1,76 @@
+﻿@using LibraryProject.Models
+@model LibraryProject.Models.Order
+
+@{
+    ViewBag.Title = "Zamówienie numer " + @Model.ID;
+}
+
+<h3 style="text-align: center">Zamówienie numer @Model.ID</h3>
+<div class="row">
+    <div class="col-md-3">
+        Godzina i data zamówienia
+    </div>
+    <div class="col-md-5">
+        @Model.OrderDate.ToString("t") @Model.OrderDate.ToString("d")
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        Status zamówienia
+    </div>
+    <div class="col-md-5">
+        @Html.Partial("_OrderStatus")
+    </div>
+</div>
+<h4 style="text-align: center">Szczegóły zamówienia</h4>
+<div class="row">
+    @foreach (var item in Model.OrderDetails)
+    {
+        <div class="col-md-11" style="margin-top: 10px; margin-bottom: 10px">
+            <div class="row rounded" style="border: 2px solid wheat; background-color: white;">
+                <div class="col-md-2">
+                    @if (item.Book.Image != null)
+                    {
+                        <img src="~/Images/@item.Book.Image" class="" width="70" height="100" alt="">
+                    }
+                    else
+                    {
+                        <img src="~/Images/nophoto.jpg" class="" width="70" height="100" alt="">
+                    }
+                </div>
+                <div class="col-4">
+                    <div class="row"><h4>@item.Book.Title</h4></div>
+                    <div class="row"><h6>@item.Book.Author.FullName</h6></div>
+                </div>
+                <div class="col-2">
+                    <div class="row"><h4>Status</h4></div>
+                    <div class="row">
+                        @switch (@item.DetailStatus)
+                        {
+                            case OrderDetail.DetailStatusEnum.Placed:
+                                <text>
+                                    W przygotowaniu
+                                </text>
+                                break;
+                            case OrderDetail.DetailStatusEnum.Ready:
+                                <text>
+                                    Gotowa do odbioru
+                                </text>
+                                break;
+                            case OrderDetail.DetailStatusEnum.Rented:
+                                <text>
+                                    Wypożyczona
+                                </text>
+                                break;
+                            case OrderDetail.DetailStatusEnum.Returned:
+                                <text>
+                                    Zwrócona
+                                </text>
+                                break;
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

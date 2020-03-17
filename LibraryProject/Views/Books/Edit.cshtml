@@ -1,0 +1,101 @@
+﻿@model LibraryProject.ViewModels.CreateBookViewModel
+
+@{
+    ViewBag.Title = "Edytuj książkę";
+}
+    <br />
+<h4 style="text-align: center">Edycja książki - @Model.Title</h4>
+<br />
+@using (Html.BeginForm("Edit", "Books", FormMethod.Post,
+    new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ID)
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            @Html.LabelFor(model => model.Isbn, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Isbn, new { htmlAttributes = new { @class = "form-control", placeholder = "Wprowadź ISBN Książki" } })
+            @Html.ValidationMessageFor(model => model.Isbn, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-6">
+            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "Wprowadź Tytuł Książki" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            @Html.LabelFor(model => model.Author, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.DropDownListFor(model => model.SelectedAuthorID, new SelectList(Model.AuthorsCollection, "ID", "FullName"), new { id = "normalDropDown1" })
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(model => model.Publisher, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.SelectedPublisherID, new SelectList(Model.PublishersCollection, "ID", "Name"), new { id = "normalDropDown2" })
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(model => model.Categories, htmlAttributes: new { @class = "control-label" })
+            @Html.ListBoxFor(model => model.SelectedCategoryID, new SelectList(Model.CategoriesCollection, "ID", "Name"), new { id = "multiSelectDropdown1" })
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            @Html.LabelFor(model => model.ReleaseDate, htmlAttributes: new { @class = "control-label" })
+            <div class="col">
+                @Html.EditorFor(model => model.ReleaseDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ReleaseDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-6">
+            @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label" })
+            <div class="col">
+                @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+            <div class="col">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "4" })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col-md-4">
+            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label" })
+            <div class="col">
+                <input class="btn btn-info" type="file" name="fileImage" />
+                @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="form-group text-right">
+        <a class="btn btn-info" href="javascript:history.go(-1)">Powrót</a>
+        <input type="submit" value="Edytuj książkę" class="btn btn-success" />
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#normalDropDown1").chosen({
+                width: "100%"
+            });
+            $("#normalDropDown2").chosen({
+                width: "100%"
+            });
+            $("#multiSelectDropdown1").chosen({
+                width: "100%"
+            });
+        });
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+}
