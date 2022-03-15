@@ -1,0 +1,130 @@
+﻿@model LibraryProject.Models.Book
+
+@{
+    ViewBag.Title = @Model.Title + " - " + @Model.Author.FullName;
+    var space = " ";
+}
+<div id="update-message" style="text-align:center"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            @if (@Model.Image != null)
+            {
+                <img src="~/Images/@Model.Image" class="img-fluid" style="border: 1px solid black" alt="">
+            }
+            else
+            {
+                <img src="~/Images/nophoto.jpg" class="img-fluid" style="border: 1px solid black" alt="">
+            }
+        </div>
+        <div class="col-md-6">
+            <h3>@Model.Title</h3>
+            <a href="@Url.Action("Details", "Authors", new {id = Model.Author.ID})"><h5>@Model.Author.FullName</h5></a>
+            <br />
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <b>ISBN</b>
+                </div>
+                <div class="col-md-6">
+                    <p class="btn">@Model.Isbn<br /></p>
+                </div>
+                <div class="col-md-6">
+                    <b>Data Wydania</b>
+                </div>
+                <div class="col-md-6">
+                    <p class="btn">@Model.ReleaseDate</p>
+                </div>
+                <div class="col-md-6">
+                    <b>Wydawnictwo</b>
+                </div>
+                <div class="col-md-6">
+                    <a class="btn" href="@Url.Action("Details", "Publishers", new {id = Model.ID})">@Model.Publisher.Name</a>
+                </div>
+                <div class="col-md-6">
+                    <b>Kategorie</b>
+                </div>
+                <div class="col-md-6">
+                    @foreach (var item in Model.Categories)
+                    {
+                        <a class="btn" href="@Url.Action("Details", "Categories", new {id = item.ID})">@item.Name</a>
+                        @space
+                    }
+                </div>
+                <div class="col-md-6">
+                    <b>Dostępność</b>
+                </div>
+                <div class="col-md-6">
+                    <p class="btn">@Model.Quantity</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-right">
+            <div class="row">
+                <div class="col-md-9 offset-3" style="margin-top: 5px; margin-bottom: 5px"><a class="btn btn-warning container-fluid" href="javascript:history.go(-1)">Powrót do listy</a></div>
+                @if (Request.IsAuthenticated)
+                {
+                    <div class="col-md-9 offset-3" style="margin-top: 5px; margin-bottom: 5px"><button class="btn btn-success AddLink container-fluid" data-id="@Model.ID">Dodaj do koszyka <i class="fa fa-cart-plus"></i></button></div>
+                }
+                @if (Context.User.IsInRole("Obsługa"))
+                {
+                    <div class="col-md-9 offset-3" style="margin-top: 5px; margin-bottom: 5px"><a href="@Url.Action("Edit", "Books", new {id = Model.ID})" class="btn btn-info container-fluid">Edytuj książkę <i class="fa fa-edit"></i></a></div>
+                    <div class="col-md-9 offset-3" style="margin-top: 5px; margin-bottom: 5px"><a href="@Url.Action("Delete", "Books", new {id = Model.ID})" class="btn btn-danger container-fluid">Usuń książkę <i class="fa fa-trash-o"></i></a></div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col" style="white-space: pre-line">
+            @Model.Description
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            // Document.ready -> link up remove event handler
+            $(".AddLink").click(function () {
+                // Get the id from the link
+                var recordToAdd = $(this).attr("data-id");
+                if (recordToAdd != '') {
+                    // Perform the ajax post
+                    $.post("/ShoppingCart/AddToCart", { "id": recordToAdd },
+                        function (data) {
+                            // Successful requests get here
+                            // Update the page elements
+                            if (data.MessageSuccess != '') {
+                                var messageSuccess = '<div class="alert alert-success" role="alert">' +
+                                    data.MessageSuccess +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageSuccess;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                            if (data.MessageWarning != '') {
+                                messageWarning = '<div class="alert alert-warning" role="alert">' +
+                                    data.MessageWarning +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageWarning;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                            if (data.MessageDanger != '') {
+                                messageDanger = '<div class="alert alert-warning" role="alert">' +
+                                    data.MessageDanger +
+                                    '</div>';
+                                document.getElementById("update-message").innerHTML = messageDanger;
+                                $("#update-message").fadeTo(2000, 500).slideUp(500, function () {
+                                    $("#update-message").slideUp(500);
+                                });
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,61 @@
+﻿@model LibraryProject.Models.Order
+
+@{
+    ViewBag.Title = "Podsumowanie";
+}
+
+<h3>Podsumowanie zamówienia</h3><br/>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ID)
+    <div class="row">
+        @foreach (var item in ViewBag.cart)
+        {
+            <div id="row-@item.ID" class="col-md-7 offset-3 rounded" style="margin-top: 10px; margin-bottom: 10px; border: 2px solid wheat; background-color: white;">
+                <div class="row">
+                    <div class="col-md-2">
+                        @if (item.Book.Image != null)
+                        {
+                            <img src="~/Images/@item.Book.Image" class="" width="70" height="100" alt="">
+                        }
+                        else
+                        {
+                            <img src="~/Images/nophoto.jpg" class="" width="70" height="100" alt="">
+                        }
+                    </div>
+                    <div class="col-10">
+                        <div class="row"><h4>@item.Book.Title</h4></div>
+                        <div class="row"><h6>@item.Book.Author.FullName</h6></div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (ViewBag.cart.Count == 0)
+        {
+            <div class="row">
+                <div class="col">
+                    <br />
+                    <h3>Nie znaleźliśmy żadnych produktów w Twoim koszyku!</h3><br />
+                    <h4>Wróć na <i class="fa fa-home"></i> stronę główną by kontynuować</h4>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-6 offset-3">
+            Oraz zamówienie o numerze <b>@ViewBag.HelperOrderId</b>
+        </div>        
+    </div>
+    <div class="form-group">
+        <div class="col-4 offset-8">
+            <a class="btn btn-info" href="javascript:history.go(-1)">Powrót</a>
+            <input type="submit" value="Zarezerwuj" class="btn btn-danger" />
+        </div>
+    </div>
+</div>
+}

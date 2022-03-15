@@ -1,0 +1,59 @@
+﻿@model LibraryProject.Models.Author
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Dodaj nowego autora</h2>
+
+
+@using (Html.BeginForm("Create", "Authors", null, FormMethod.Post,
+                              new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "4" })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label" })
+            <div class="col">
+                <input id="Image" class="btn btn-info" type="file" name="file" />
+                @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <a class="btn btn-info" href="@Url.Action("Index", "Support")">Powrót</a>
+            <input type="submit" value="Dodaj autora" class="btn btn-success" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

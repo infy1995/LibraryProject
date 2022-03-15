@@ -1,0 +1,12 @@
+﻿@model int
+@{
+    ViewBag.Title = "Checkout Complete";
+}
+
+<div class="row">
+    <div class="col text-center">
+        <h3>Zamówienie zrealizowane numer zamówienia: @Model</h3>
+        <h4>Potwierdzenie zostało wysłane na adres email</h4>
+        <a href="@Url.Action("Index", "Books")"><h5>Powrót do strony głównej</h5></a>
+    </div>
+</div>

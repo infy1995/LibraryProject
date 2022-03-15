@@ -1,0 +1,52 @@
+﻿@using PagedList.Mvc
+@using LibraryProject.Models
+@model PagedList.IPagedList<LibraryProject.Models.Category>
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Lista Kategorii";
+}
+
+@using (Html.BeginForm("Index", "Categories", FormMethod.Get))
+{
+    <p>
+        Szukaj: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+        <button class="btn btn-info" type="submit">Szukaj <i class="fa fa-search"></i></button>
+        <a href="@Url.Action("Index","Categories")" class="btn btn-success">Pokaż wszystko <i class="fa fa-refresh"></i></a>
+    </p>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>
+            @Html.ActionLink("Kategoria", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn" })
+        </h4>
+    </div>
+    <div class="col-md-6">
+        <h4>
+            @Html.ActionLink("Ilość książek", "Index", new { sortOrder = ViewBag.Count, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn" })
+        </h4>
+    </div>
+    @foreach (var item in @Model)
+    {
+<div class="col-md-7">
+    @if (Context.User.IsInRole("Obsługa"))
+    {
+        <a href="@Url.Action("Delete", "Categories", new { id = @item.ID })" class="btn btn-danger"><i class="fa fa-trash-o"></i></a>
+        <a href="@Url.Action("Edit", "Categories", new {id = item.ID})" class="btn btn-success"><i class="fa fa-edit"></i></a>
+    }
+    <b><a class="btn" href="@Url.Action("Details", "Categories", new {item.ID})">@item.Name</a></b>
+</div>
+        <div class="col-md-5">
+            <b>@item.Books.Count</b>
+        </div>
+    }
+</div>
+<div class="row">
+    <div class="col-md-3 offset-9">
+        Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+
+        @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+</div>

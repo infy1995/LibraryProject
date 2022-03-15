@@ -1,0 +1,38 @@
+﻿<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+    @Html.ActionLink("Biblioteka Online", "Index", "Books", new { area = "" }, new { @class = "navbar-brand" })
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                @Html.ActionLink("Strona Główna", "Index", "Books", new { area = "" }, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("Lista Autorów", "Index", "Authors", new { area = "" }, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("Lista Wydawnictw", "Index", "Publishers", new { area = "" }, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("Lista Kategorii", "Index", "Categories", new { area = "" }, new { @class = "nav-link" })
+            </li>
+            @if (Request.IsAuthenticated)
+            {
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "ShoppingCart")" class="nav-link">Koszyk<i class="fa fa-shopping-cart"></i></a>
+                </li>
+            }
+            @if (Context.User.IsInRole("Obsługa"))
+            {
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Support")" class="nav-link">Panel</a>
+                </li>
+            }
+        </ul>
+        <div class="my-2 my-lg-0">
+            @Html.Partial("_LoginPartial")
+        </div>
+    </div>
+</nav>

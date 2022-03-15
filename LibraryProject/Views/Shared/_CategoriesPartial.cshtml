@@ -1,0 +1,17 @@
+﻿@using LibraryProject.Models
+<div class="col-md-3">
+    <h5>Kategorie książek</h5>
+    <div class="row">
+        <div class="col-md-12 container-fluid btn bg-dark">
+            <a href="@Url.Action("Index","Books", new {})" class="btn text-success" style="font-weight: bold">Wszystkie Kategorie</a>
+        </div>
+    </div>
+    @foreach (Category categories in ViewBag.Categories)
+    {
+        <div class="row">
+            <div class="col-md-12 container-fluid btn bg-dark">
+                <a href="@Url.Action("Details","Categories", new {categories.ID})" class="btn text-success" style="font-weight: bold">@categories.Name</a>
+            </div>
+        </div>
+    }
+</div>

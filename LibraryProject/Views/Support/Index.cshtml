@@ -1,0 +1,116 @@
+﻿@using LibraryProject.Models
+@using PagedList.Mvc
+@using LibraryProject.Models
+@model PagedList.IPagedList<LibraryProject.Models.Order>
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Panel obsługi";
+}
+
+<div>
+    <a href="@Url.Action("Create", "Authors")" class="btn btn-info">Dodaj autora <i class="fa fa-user-plus"></i></a>
+    <a href="@Url.Action("Create", "Publishers")" class="btn btn-info">Dodaj wydawnictwo <i class="fa fa-user-plus"></i></a>
+    <a href="@Url.Action("Create", "Books")" class="btn btn-info">Dodaj książkę<i class="fa fa-book"></i></a>
+    <a href="@Url.Action("Create", "Categories")" class="btn btn-info">Dodaj kategorie<i class="fa fa-filter"></i></a>
+</div>
+
+</br>
+
+@using (Html.BeginForm("Index", "Support", FormMethod.Get))
+{
+    <p>
+        Szukaj po id zamówienia: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+        <button class="btn btn-info" type="submit"><i class="fa fa-search"></i> Szukaj</button>
+        <a href="@Url.Action("Index","Support")" class="btn btn-success">
+            <span class="fa fa-refresh"></span> Pokaż wszystko
+        </a>
+    </p>
+}
+
+@Html.ActionLink("W przygotowaniu", "Index", new { sortOrder = ViewBag.Placed, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+@Html.ActionLink("Przygotowane", "Index", new { sortOrder = ViewBag.Ready, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+@Html.ActionLink("Wypożyczone", "Index", new { sortOrder = ViewBag.Rented, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+@Html.ActionLink("Zakończone", "Index", new { sortOrder = ViewBag.Returned, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+@Html.ActionLink("Wszystkie", "Index", new { sortOrder = ViewBag.AllOrders, currentFilter = ViewBag.CurrentFilter }, new { @class = "btn btn-light" })
+<div class="row">
+    <div class="col-md-3">
+        ID zamówienia
+    </div>
+    <div class="col-md-3">
+        Czytelnik
+    </div>
+    <div class="col-md-3">
+        Data złożenia zamówienia
+    </div>
+    <div class="col-md-3">
+        Status
+    </div>
+</div>
+@foreach (var order in @Model)
+{
+    <div class="row rounded" onclick="tableFunction('@Url.Action("Details", "Support", new {@id = order.ID})')" style="margin-top: 10px; margin-bottom: 10px; border: 2px solid wheat; background-color: white;">
+        <div class="col-md-3">
+            @order.ID
+        </div>
+        <div class="col-md-3">
+            @order.Profile.Login
+        </div>
+        <div class="col-md-3">
+            @order.OrderDate.ToString("dd.MM.yy")
+        </div>
+        <div class="col-md-3">
+            @switch (@order.OrderStatus)
+            {
+                case Order.OrderStatusEnum.Placed:
+                    <text>
+                        W przygotowaniu
+                    </text>
+                    break;
+                case Order.OrderStatusEnum.Ready:
+                    <text>
+                        Przygotowane
+                    </text>
+                    break;
+                case Order.OrderStatusEnum.Rented:
+                    <text>
+                        Wypożyczone
+                    </text>
+                    break;
+                case Order.OrderStatusEnum.Returned:
+                    <text>
+                        Zakończone
+                    </text>
+                    break;
+            }
+        </div>
+
+    </div>
+}
+
+<div class="row" style="padding: 50px">
+    <div class="col-md3 offset-9">
+        Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+
+        @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function tableFunction(src) {
+            location.href = src;
+
+        }
+        jQuery(document).ready(function ($) {
+            $(".DetailsLink").click(function () {
+                var recordToToggle = $(this).attr("data-id");
+                $('.hider').hide();
+                $('#row-' + recordToToggle).stop().slideToggle();
+            });
+        });
+    </script>
+}

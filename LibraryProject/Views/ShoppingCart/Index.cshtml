@@ -1,0 +1,267 @@
+﻿@model LibraryProject.ViewModels.ShoppingCartViewModel
+@{
+    ViewBag.Title = "Koszyk";
+}
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-12 rounded" style="border: 2px solid wheat; background-color: white"><h3 id="cart-status"></h3></div>
+        </div>
+        <br />
+        <div class="row rounded" style="border: 2px solid wheat; background-color: white;">
+            @foreach (var item in Model.CartItems)
+            {
+                <div id="row-@item.ID" class="col-md-12" style="margin-top: 10px; margin-bottom: 10px">
+                    <div class="row">
+                        <div class="col-md-4">
+                            @if (item.Book.Image != null)
+                            {
+                                <img src="~/Images/@item.Book.Image" class="" width="70" height="100" alt="">
+                            }
+                            else
+                            {
+                                <img src="~/Images/nophoto.jpg" class="" width="70" height="100" alt="">
+                            }
+                        </div>
+                        <div class="col-6">
+                            <div class="row"><h4>@item.Book.Title</h4></div>
+                            <div class="row"><h6>@item.Book.Author.FullName</h6></div>
+                        </div>
+                        <div class="col-md-2 text-md-right">
+                            <a href="#" class="RemoveLink btn btn-danger" data-id="@item.ID">
+                                Usuń
+                                @*<i style="font-size: 1.4rem" class="fa fa-trash-o"></i>*@
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (@Model.CartItems.Count == 0)
+            {
+                <div class="row">
+                    <div class="col">
+                        <br />
+                        <h3>Nie znaleźliśmy żadnych produktów w Twoim koszyku!</h3><br />
+                        <h4>Wróć na <i class="fa fa-home"></i> stronę główną by kontynuować</h4>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-12 rounded" id="RemoveHelperId" style="border: 2px solid wheat; background-color: white; display:none">
+                <div class="row">
+                    <div class="col-md-10">
+                        Dodatkowe zamówienie innego użytkownika numer: <b id="helperOrder"></b>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="#" class="RemoveHelper btn btn-danger">Usuń</a>
+                    </div>
+                </div>            
+            </div>            
+        </div>
+        @if (@Model.CartItems.Count != 0)
+        {
+            <br />
+            <div class="row">
+                <div class="col-md-12 rounded" style="border: 2px solid wheat; background-color: white">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="odbiorOsobisty">
+                        <label class="form-check-label" for="odbiorOsobisty">
+                            Odbiór osobisty
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="dostawa">
+                        <label class="form-check-label" for="dostawa">
+                            Dostawa do domu
+                        </label>
+                    </div>
+                    <div id="divOdbior" style="display:none">
+                        @if (@Model.Profile.geoLocationLng == null && @Model.Profile.geoLocationLng == null)
+                        {
+                            <h3>Najpierw uzupełnij swój adres w profilu.</h3>
+                        }
+                        else
+                        {
+                            if (@Model.Orders.Count != 0)
+                            {
+                                <div id="map" style="height:400px;width:100%"></div>
+                            }
+                            else
+                            {
+                                <h3>Nie ma dodatkowych zamówień które mógłbyś dostarczyć.</h3>
+                            }
+                        }
+                    </div>
+                    <div id="divDostawa" style="display:none">
+                        @if (@Model.Profile.geoLocationLng == null && @Model.Profile.geoLocationLng == null)
+                        {
+                            <h3>Najpierw uzupełnij swój adres w profilu.</h3>
+                        }
+                        @if (@Model.Profile.PhoneNumber == null)
+                        {
+                            <h3>Najpierw uzupełnij swój numer telefonu w profilu.</h3>
+                        }                        
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col rounded" style="border: 2px solid wheat; background-color: white">
+                <h5>Przejdz dalej</h5>
+                <div class="row" id="nextbutton">
+
+                </div>
+
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @if (@Model.Profile.geoLocationLng != null && @Model.Profile.geoLocationLng != null)
+    {
+<script>
+        function initMap() {
+            var options = {
+                zoom: 15,
+                center: new google.maps.LatLng(@Model.Profile.geoLocationLat, @Model.Profile.geoLocationLng)
+            }
+            var map = new google.maps.Map(document.getElementById('map'), options);
+            var myMarker = new google.maps.Marker({
+                position: new google.maps.LatLng(@Model.Profile.geoLocationLat, @Model.Profile.geoLocationLng),
+                map: map,
+                icon: 'https://img.icons8.com/office/30/000000/home--v1.png',
+                title: 'Twój adres'
+            });
+
+            var markers = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Orders));
+
+            for (var i = 0; i < markers.length; i++) {
+                addMarker(markers[i]);
+            }
+
+            function addMarker(props) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(props.Profile.geoLocationLat, props.Profile.geoLocationLng),
+                    map: map
+                });
+                var button = '<button onclick="addHelperOrder('+ props.ID +')" class="btn btn-primary">Dodaj do koszyka</button>';
+                var content = "Zamówienie numer: " + props.ID + "</br>" + props.Profile.FullAdress + '</br>' + button ;
+                var infoWindow = new google.maps.InfoWindow({
+                    content: content
+                });
+                marker.addListener('click', function () {
+                    infoWindow.open(map, marker);
+                });
+            }
+        }
+</script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@(LibraryProject.Properties.Settings.Default.GoogleMapsApiKey)&callback=initMap"></script>
+    }
+<script type="text/javascript">
+        window.onload = function () {
+
+            var odbiorOsobisty = document.getElementById('odbiorOsobisty');
+            var dostawa = document.getElementById('dostawa');
+
+            odbiorOsobisty.onclick = OdbiorOsobisty;
+            dostawa.onclick = Dostawa;
+        }
+
+        function OdbiorOsobisty() {
+            $.post("/ShoppingCart/ChangeOrderType", { "type": 1 });
+            Close();
+            var zawartoscOdbior = document.getElementById("divOdbior");
+            if (document.getElementById('odbiorOsobisty').checked) {
+                if (zawartoscOdbior.style.display === "none") {
+                    zawartoscOdbior.style.display = "block";
+                }
+            }
+        }
+
+        function Dostawa() {
+            $.post("/ShoppingCart/ChangeOrderType", { "type": 2 });
+            Close();
+            var dostawa = document.getElementById("divDostawa");
+            if (document.getElementById('dostawa').checked) {
+                if (dostawa.style.display === "none") {
+                    dostawa.style.display = "block";
+                }
+            }
+        }
+
+        function Close() {
+            var dostawa = document.getElementById("divDostawa");
+            var zawartoscOdbior = document.getElementById("divOdbior");
+            dostawa.style.display = "none";
+            zawartoscOdbior.style.display = "none";
+        }
+
+        if (@Model.CartItems.Count > 0) {
+            var message1 =
+                '<div class="col text-center"><a href="@Url.Action("Summary", "Checkout")" class="btn btn-success container-fluid" style="color:white">Zamów</a></div>';
+            document.getElementById("nextbutton").innerHTML = message1;
+        } else {
+            var message2 =
+                '<div class="col text-center"><a class="disabled btn btn-success container-fluid" style="color:white">Zamów</a></div>';
+
+            document.getElementById("nextbutton").innerHTML = message2;
+        }
+        $(function () {
+            // Document.ready -> link up remove event handler
+            $('#cart-status').text('Twój koszyk (' + @Model.CartItems.Count + ')');
+            $(".RemoveLink").click(function () {
+                // Get the id from the link
+                var recordToDelete = $(this).attr("data-id");
+                if (recordToDelete != '') {
+                    // Perform the ajax post
+                    $.post("/ShoppingCart/RemoveFromCart", { "id": recordToDelete },
+                        function (data) {
+                            // Successful requests get here
+                            // Update the page elements
+                            if (data.ItemCount == 0) {
+                                $('#row-' + data.DeleteId).fadeOut('slow');
+                            }
+                            if (data.CartCount == 0) {
+                                var message3 =
+                                    '<div class="col text-center"><a class="disabled btn btn-success container-fluid" style="color:white">Zamów</a></div>';
+
+                                document.getElementById("nextbutton").innerHTML = message3;
+                            }
+                            $('#cart-status').text('Twój koszyk (' + data.CartCount + ')');
+                        });
+                }
+            });
+        });
+    var RemoveHelperId = document.getElementById('RemoveHelperId');
+        $(function () {
+            // Document.ready -> link up remove event handler
+            $(".RemoveHelper").click(function () {
+                $.post("/ShoppingCart/RemoveHelperOrder");
+                $('#helperOrder').text('');
+                RemoveHelperId.style.display = "none"
+            });
+        });
+        function addHelperOrder(orderToAdd) {
+            console.log(orderToAdd);
+            if (orderToAdd != '') {
+                $.post("ShoppingCart/AddHelperOrder", { "id": orderToAdd });
+                $('#helperOrder').text(orderToAdd);
+                RemoveHelperId.style.display = "block"
+            };
+        }
+</script>
+    @if (Model.Profile.HelperOrders != null)
+    {
+        <script type="text/javascript">
+            $('#helperOrder').text(@Model.Profile.HelperOrders.ID);
+            RemoveHelperId.style.display = "block"
+        </script>
+    }
+}
